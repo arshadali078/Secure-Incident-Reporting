@@ -1,0 +1,18 @@
+# dependencies
+**/node_modules/
+
+
+# logs
+**/logs/
+**/*.log
+
+# builds
+**/dist/
+**/build/
+
+# uploads
+backend/src/public/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
