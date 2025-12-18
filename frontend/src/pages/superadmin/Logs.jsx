@@ -119,7 +119,11 @@ export default function AuditLogsPage() {
                                                             <span>{l.performedBy.email}</span>
                                                         </div>
                                                     ) : (
-                                                        l.performedBy || '-'
+                                                        typeof l.performedBy === 'object' && l.performedBy !== null ? (
+                                                            <span>{JSON.stringify(l.performedBy)}</span>
+                                                        ) : (
+                                                            l.performedBy || '-'
+                                                        )
                                                     )}
                                                 </td>
                                                 <td className="px-3 py-2 text-slate-700">{l.ipAddress}</td>

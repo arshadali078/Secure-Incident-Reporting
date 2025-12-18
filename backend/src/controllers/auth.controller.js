@@ -129,8 +129,23 @@ const refresh = asyncHandler(async (req, res) => {
 
     const incomingHash = hashToken(token);
     if (!user.refreshTokenHash || incomingHash !== user.refreshTokenHash) {
-        res.status(401);
-        throw new Error("Refresh token reuse detected");
+        // Possible refresh token reuse or invalid token.
+        // Invalidate any stored refresh token to force logout and clear cookie.
+        try {
+            user.refreshTokenHash = undefined;
+            await user.save({ validateBeforeSave: false });
+        } catch (saveErr) {
+            // ignore save errors, but don't crash
+            console.error('Failed to clear refreshTokenHash on reuse detection', saveErr);
+        }
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+        });
+
+        return res.status(401).json({ success: false, message: 'Refresh token reuse detected' });
     }
 
     const accessToken = generateToken(user._id.toString(), user.role);
